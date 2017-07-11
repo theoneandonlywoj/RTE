@@ -53,7 +53,7 @@ import tensorflow as tf
 #x_data = np.reshape(x_data, (x_data.shape[0], x_data.shape[1], 1))
 
 
-seq_len = 10
+seq_len = 100
 def load_data(data, n_prev = seq_len):  
 
     docX, docY = [], []
@@ -93,17 +93,22 @@ import time
 def build_model(features, seq_len, out):
     model = Sequential()
 
-    model.add(LSTM(20, input_shape = (seq_len, features), return_sequences=True))
-    #model.add(Dropout(0.2))
+    model.add(LSTM(10, input_shape = (seq_len, features), return_sequences=True))
+    model.add(Dropout(0.5))
     
-    model.add(LSTM(10,return_sequences = False))
+
+    model.add(LSTM(10,return_sequences = True))
+
+    model.add(LSTM(20,return_sequences = False))
     #model.add(Dropout(0.2))
 
     model.add(Dense(units = out))
     #model.add(Activation("linear"))
 
     start = time.time()
-    model.compile(loss = "mse", optimizer = "adam")
+    adam = keras.optimizers.Adam(lr = 0.5, beta_1 = 0.9, beta_2 = 0.999, epsilon = 1e-08, decay = 0.0)
+
+    model.compile(loss = "mse", optimizer = adam)
     print("> Compilation Time : ", time.time() - start)
     return model
 
@@ -129,15 +134,15 @@ best_model = keras.callbacks.ModelCheckpoint(filepath = filepath,
                                              save_weights_only = False, 
                                              mode = 'auto', period = 1)
 
-reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=0.00001)
+reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor = 'val_loss', factor = 0.5, patience = 2)
 # In[ ]:
 
 
 model.fit(
     x_data,
     y_data,
-    batch_size = 10,
-    epochs = 1200,
+    batch_size = 100,
+    epochs = 800,
     validation_split = 0.05,
     callbacks = [best_model, tbCallBack, reduce_lr])
 
