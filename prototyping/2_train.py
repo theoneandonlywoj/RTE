@@ -53,7 +53,7 @@ import tensorflow as tf
 #x_data = np.reshape(x_data, (x_data.shape[0], x_data.shape[1], 1))
 
 
-seq_len = 100
+seq_len = 1000
 def load_data(data, n_prev = seq_len):  
 
     docX, docY = [], []
@@ -93,13 +93,13 @@ import time
 def build_model(features, seq_len, out):
     model = Sequential()
 
-    model.add(LSTM(10, input_shape = (seq_len, features), return_sequences=True))
-    model.add(Dropout(0.5))
+    model.add(LSTM(100, input_shape = (seq_len, features), return_sequences=False))
+    #model.add(Dropout(0.5))
     
+	
+    #model.add(LSTM(10,return_sequences = True))
 
-    model.add(LSTM(10,return_sequences = True))
-
-    model.add(LSTM(20,return_sequences = False))
+    #model.add(LSTM(20,return_sequences = False))
     #model.add(Dropout(0.2))
 
     model.add(Dense(units = out))
